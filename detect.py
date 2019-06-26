@@ -78,7 +78,7 @@ def arg_parse():
                         default = "cfg/yolov3.cfg", type = str)
     parser.add_argument("--weights", dest = 'weightsfile', help = 
                         "weightsfile",
-                        default = "yolov3.weights", type = str)
+                        default = "weights/yolov3.weights", type = str)
     parser.add_argument("--reso", dest = 'reso', help = 
                         "Input resolution of the network. Increase to increase accuracy. Decrease to increase speed",
                         default = "416", type = str)
@@ -199,7 +199,7 @@ if __name__ ==  '__main__':
     
 
     write = False
-    model(get_test_input(inp_dim, CUDA), CUDA)
+#model(get_test_input(inp_dim, CUDA), CUDA)
     
     start_det_loop = time.time()
     
@@ -208,7 +208,7 @@ if __name__ ==  '__main__':
     
     
     for batch in im_batches:
-        #load the image 
+        #load the image
         start = time.time()
         if CUDA:
             batch = batch.cuda()
@@ -334,6 +334,9 @@ if __name__ ==  '__main__':
     print()
     print("SUMMARY")
     print("----------------------------------------------------------")
+    print("{:25s}: {}".format("Mode", args.mode))
+    print("{:25s}: {}".format("Model", args.weightsfile))
+    print("{:25s}: {}".format("Resolution", args.reso))
     print("{:25s}: {}".format("Task", "Time Taken (in seconds)"))
     print()
     print("{:25s}: {:2.3f}".format("Reading addresses", load_batch - read_dir))
