@@ -120,7 +120,7 @@ if __name__ ==  '__main__':
     start = 0
 
     # GPU option
-    if args.mode is "GPU":
+    if args.mode == "GPU":
         print("GPU Mode")
         if torch.cuda.is_available():
             print("GPU is available")
