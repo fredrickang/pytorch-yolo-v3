@@ -73,7 +73,8 @@ def arg_parse():
                         default = "416", type = str)
     parser.add_argument("--scales", dest = "scales", help = "Scales to use for detection",
                         default = "1,2,3", type = str)
-    
+    parser.add_argument("--gpu", dest='is_gpu', help = "GPU option",default = False)
+
     return parser.parse_args()
 
 if __name__ ==  '__main__':
@@ -107,7 +108,18 @@ if __name__ ==  '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
 
-    CUDA = torch.cuda.is_available()
+    # GPU option
+    if args.is_gpu == True:
+        print("GPU Mode")
+        if torch.cuda.is_available():
+            print("GPU is available")
+        else:
+            print("GPU is not available")
+            print("Running as CPU mode")
+    else:
+        print("CPU Mode")
+
+    CUDA = args.is_gpu and torch.cuda.is_available()
 
     num_classes = 80
     classes = load_classes('data/coco.names') 
