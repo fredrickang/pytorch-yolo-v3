@@ -16,6 +16,17 @@ import random
 import pickle as pkl
 import itertools
 
+
+############
+# TODO: 1. GPU CPU mode switch
+#       2. Input resolution change
+#       3. Input load module change
+#       4. Network variation
+#
+#
+###########
+
+
 class test_net(nn.Module):
     def __init__(self, num_layers, input_size):
         super(test_net, self).__init__()
@@ -73,7 +84,7 @@ def arg_parse():
                         default = "416", type = str)
     parser.add_argument("--scales", dest = "scales", help = "Scales to use for detection",
                         default = "1,2,3", type = str)
-    parser.add_argument("--gpu", dest='is_gpu', help = "GPU option",default = False)
+    parser.add_argument("--mode", dest='mode', help = "GPU option",default = 'GPU', type = str)
 
     return parser.parse_args()
 
@@ -109,17 +120,20 @@ if __name__ ==  '__main__':
     start = 0
 
     # GPU option
-    if args.is_gpu == True:
+    if args.mode is "GPU":
         print("GPU Mode")
         if torch.cuda.is_available():
             print("GPU is available")
+            CUDA = True
         else:
             print("GPU is not available")
             print("Running as CPU mode")
+            CUDA = False
     else:
         print("CPU Mode")
+        CUDA = False
 
-    CUDA = args.is_gpu and torch.cuda.is_available()
+
 
     num_classes = 80
     classes = load_classes('data/coco.names') 
