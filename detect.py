@@ -166,8 +166,7 @@ if __name__ ==  '__main__':
         
     if batch_size != 1:
         num_batches = len(imlist) // batch_size + leftover            
-        im_batches = [torch.cat((im_batches[i*batch_size : min((i +  1)*batch_size,
-                            len(im_batches))]))  for i in range(num_batches)]        
+        im_batches = [torch.cat((im_batches[i*batch_size : min((i +  1)*batch_size, len(im_batches))]))  for i in range(num_batches)]
 
 
     i = 0
@@ -231,7 +230,8 @@ if __name__ ==  '__main__':
             output = prediction
             write = 1
         else:
-            output = torch.cat((output,prediction))
+            if output.size()[1] == prediction.size()[1]:
+                output = torch.cat((output,prediction))
             
         
         
