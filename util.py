@@ -96,7 +96,7 @@ def unique(tensor):
     tensor_res.copy_(unique_tensor)
     return tensor_res
 
-def write_results(prediction, confidence, num_classes, nms = True, nms_conf = 0.4):
+def write_results(mode ,prediction, confidence, num_classes, nms = True, nms_conf = 0.4):
     conf_mask = (prediction[:,:,4] > confidence).float().unsqueeze(2)
     prediction = prediction*conf_mask
     
@@ -174,7 +174,7 @@ def write_results(prediction, confidence, num_classes, nms = True, nms_conf = 0.
                     #Get the IOUs of all boxes that come after the one we are looking at 
                     #in the loop
                     try:
-                        ious = bbox_iou(image_pred_class[i].unsqueeze(0), image_pred_class[i+1:])
+                        ious = bbox_iou(image_pred_class[i].unsqueeze(0), image_pred_class[i+1:], mode)
                     except ValueError:
                         break
         

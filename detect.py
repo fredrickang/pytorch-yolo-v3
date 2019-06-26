@@ -84,7 +84,7 @@ def arg_parse():
                         default = "416", type = str)
     parser.add_argument("--scales", dest = "scales", help = "Scales to use for detection",
                         default = "1,2,3", type = str)
-    parser.add_argument("--mode", dest='mode', help = "GPU option",default = 'GPU', type = str)
+    parser.add_argument("--mode", dest='mode', help = "GPU option",default = "GPU", type = str)
 
     return parser.parse_args()
 
@@ -233,7 +233,7 @@ if __name__ ==  '__main__':
         #clubbing these ops in one loop instead of two. 
         #loops are slower than vectorised operations. 
         
-        prediction = write_results(prediction, confidence, num_classes, nms = True, nms_conf = nms_thesh)
+        prediction = write_results(args.mode ,prediction, confidence, num_classes, nms = True, nms_conf = nms_thesh)
         
         
         if type(prediction) == int:
