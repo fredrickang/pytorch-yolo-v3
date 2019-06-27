@@ -175,12 +175,10 @@ if __name__ ==  '__main__':
     print("Connection from:" + str(addr))
 
     while True:
-        imlist = conn.recv(1024).decode()
+        imlist = conn.recv(1024)
 
         if not imlist:
             break
-
-        print(len(imlist))
 
         batches = list(map(prep_image_cloud, imlist, [inp_dim]))
         im_batches = [x[0] for x in batches]
