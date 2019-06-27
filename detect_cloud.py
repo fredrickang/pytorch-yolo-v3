@@ -173,12 +173,12 @@ if __name__ ==  '__main__':
     conn, addr = serversock.accept()
 
     print("Connection from:" + str(addr))
-	
-	num_img_inf = 0
+    
+    num_img_inf = 0
     while True:
-		num_img_inf += 1
-
-		tot_size = 0
+        num_img_inf += 1
+        
+        tot_size = 0
 		l = conn.recv(4096)
 		tot_img += l
 		tot_size += len(l)
