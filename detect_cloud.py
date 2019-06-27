@@ -343,9 +343,9 @@ if __name__ ==  '__main__':
         print("----------------------------------------------------------")
 
         torch.cuda.empty_cache()
-		conn.send('done iter'.encode('utf-8'))
-		if(num_img_inf == 11):
-			break
+        conn.send('done iter'.encode('utf-8'))
+        if(num_img_inf == 11):
+            break
 	conn.close()
 
 
