@@ -28,19 +28,21 @@ if not os.path.exists(det):
     os.makedirs(det)
 
 transfer_data = []
+
 for i in range(len(imlist)):
-	oriimg = cv2.imread(imlist[i]))
-	newimg = cv2.resize(oriimg,(640,640,3))
-    transfer_data[i].append(newimg)
+    oriimg = cv2.imread(imlist[i])
+    newimg = cv2.resize(oriimg,(640,640),interpolation = cv2.INTER_AREA)
+    transfer_data.append(newimg)
+    
 clientsock  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsock.connect((HOST,PORT))
 
 print("Server has been connected")
 
 for i in range(len(transfer_data)):
-
     clientsock.send(transfer_data[i])
-	clientsock.recv(1024)
+    clientsock.recv(1024)
+
 clientsock.shutdown(socket.SHUT_WR)
 
 print("Connection end")
