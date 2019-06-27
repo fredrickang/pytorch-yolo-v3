@@ -134,7 +134,7 @@ if __name__ ==  '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
 
-
+# SIBAL!
     # GPU option
     print("GPU Mode")
     CUDA = True
