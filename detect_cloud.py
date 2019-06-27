@@ -346,12 +346,7 @@ if __name__ ==  '__main__':
         conn.send('done iter'.encode('utf-8'))
         if(num_img_inf == 11):
             break
-	conn.close()
-
-
-    
-    
-    
+    conn.close()
 
     
     
