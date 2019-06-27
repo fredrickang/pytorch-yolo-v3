@@ -103,6 +103,15 @@ def arg_parse():
 
     return parser.parse_args()
 
+def recvall(sock, count):
+    buf = b''
+    while count:
+        newbuf = sock.recv(count)
+        if not newbuf: return None
+        buf += newbuf
+        count -= len(newbuf)
+    return buf
+
 if __name__ ==  '__main__':
     args = arg_parse()
     
@@ -186,21 +195,14 @@ if __name__ ==  '__main__':
 
     print("Connection from:" + str(addr))
     
-    num_img_inf = 0
-    while True:
-        num_img_inf += 1
+    
 
-        tot_size = 0
-        l = conn.recv(4096)
-        tot_img = l
-        tot_size += len(l)
-        while (l):
-            if(tot_size == 1228800):
-                break
-            l = conn.recv(4096)
-            tot_img += l
-            tot_size += len(l)
-            imlist = tot_img
+    
+    while True:
+        length = recvall(conn,16)
+        stringData = recvall(conn,int(lenght))
+
+        imlist = np.fromstring(stringData,dtype='uint8')
             
         batches = list(map(prep_image_cloud, imlist, [inp_dim]))
         im_batches = [x[0] for x in batches]
