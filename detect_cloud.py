@@ -173,13 +173,23 @@ if __name__ ==  '__main__':
     conn, addr = serversock.accept()
 
     print("Connection from:" + str(addr))
-
+	
+	num_img_inf = 0
     while True:
-        imlist = conn.recv(1024)
+		num_img_inf += 1
 
-        if not imlist:
-            break
-
+		tot_size = 0
+		l = conn.recv(4096)
+		tot_img += l
+		tot_size += len(l)
+		while (l):
+			if(tot_size == 1228800):
+				break
+			l = conn.recv(4096)
+            tot_img += l
+			tot_size += len(l)
+		imlist = tot_img
+		  
         batches = list(map(prep_image_cloud, imlist, [inp_dim]))
         im_batches = [x[0] for x in batches]
         orig_ims = [x[1] for x in batches]
@@ -333,7 +343,10 @@ if __name__ ==  '__main__':
         print("----------------------------------------------------------")
 
         torch.cuda.empty_cache()
-
+		conn.send('done iter'.encode('utf-8'))
+		if(num_img_inf == 11):
+			break
+	conn.close()
 
 
     
