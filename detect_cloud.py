@@ -177,12 +177,12 @@ if __name__ ==  '__main__':
     num_img_inf = 0
     while True:
         num_img_inf += 1
-        
+
         tot_size = 0
-		l = conn.recv(4096)
-		tot_img += l
-		tot_size += len(l)
-		while (l):
+        l = conn.recv(4096)
+        tot_img += l
+        tot_size += len(l)
+        while (l):
             if(tot_size == 1228800):
                 break
             l = conn.recv(4096)
