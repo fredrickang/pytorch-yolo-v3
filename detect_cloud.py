@@ -200,14 +200,13 @@ if __name__ ==  '__main__':
     
     while True:
         length = recvall(conn,16)
-        stringData = recvall(conn,int(lenght))
+        stringData = recvall(conn,int(length.decode()))
 
         imlist = np.fromstring(stringData,dtype='uint8')
-            
-        batches = list(map(prep_image_cloud, imlist, [inp_dim]))
-        im_batches = [x[0] for x in batches]
-        orig_ims = [x[1] for x in batches]
-        im_dim_list = [x[2] for x in batches]
+        
+        imlist = imlist.reshape((640,640,3))
+
+        im_batches, orig_ims, im_dim_list = list(prep_image_cloud(imlist,inp_dim)) 
         im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
         
         load_batch = time.time()
