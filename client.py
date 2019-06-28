@@ -4,7 +4,7 @@ import os.path as osp
 import cv2
 
 HOST = '10.150.21.160'
-PORT = 8080
+PORT = 1111
 TRANSFER_SIZE = 1024
 
 images = 'imgs'
@@ -28,17 +28,24 @@ if not os.path.exists(det):
     os.makedirs(det)
 
 transfer_data = []
-for i in range(len(imlist)):
-    transfer_data.append(cv2.imread(imlist[i]))
 
+for i in range(len(imlist)):
+    oriimg = cv2.imread(imlist[i])
+    dim = (640,640)
+    newimg = cv2.resize(oriimg,(640,640))
+    transfer_data.append(newimg)
+    
 clientsock  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsock.connect((HOST,PORT))
 
 print("Server has been connected")
 
 for i in range(len(transfer_data)):
-
-    clientsock.send(transfer_data[i])
+    stringData = transfer_data[i].tostring()
+    clientsock.send(str(len(stringData)).ljust(16))
+    clientsock.send(stringData)
+    
+    clientsock.recv(1024)
 
 clientsock.shutdown(socket.SHUT_WR)
 
