@@ -51,7 +51,6 @@ def prep_image_cloud(img, inp_dim):
     """
 
     orig_im = img
-    print(orig_im.shape)
     dim = orig_im.shape[1], orig_im.shape[0]
     img = (letterbox_image(orig_im, (inp_dim, inp_dim)))
     img_ = img[:, :, ::-1].transpose((2, 0, 1)).copy()
