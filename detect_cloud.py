@@ -201,7 +201,7 @@ if __name__ ==  '__main__':
         width = int(recvall(conn,16).decode())
         if width == -1:
             break
-        height = int(recvall(conn,16).decode)
+        height = int(recvall(conn,16).decode())
         
         stringData = recvall(conn,width*height*3)
 
