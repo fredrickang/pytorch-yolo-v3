@@ -199,6 +199,8 @@ if __name__ ==  '__main__':
     
     while True:
         length = recvall(conn,16)
+        if lenght == -1:
+            break
         stringData = recvall(conn,int(length.decode()))
 
         imlist = np.fromstring(stringData,dtype='uint8')
@@ -339,9 +341,7 @@ if __name__ ==  '__main__':
         torch.cuda.empty_cache()
         '''
         
-        conn.send('done iter'.encode('utf-8'))
-        if(num_img_inf == 11):
-            break
+        conn.send('1'.encode('utf-8'))
     conn.close()
 
     
