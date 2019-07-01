@@ -2,7 +2,7 @@ import socket
 import os
 import os.path as osp
 import cv2
-
+import time 
 HOST = '10.150.21.160'
 PORT = 1111
 TRANSFER_SIZE = 1024
@@ -32,26 +32,28 @@ transfer_data = []
 for i in range(len(imlist)):
     oriimg = cv2.imread(imlist[i])
     transfer_data.append(oriimg)
-    
+
+server_start = time.time()
+
 clientsock  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsock.connect((HOST,PORT))
 
 print("Server has been connected")
 
-print(transfer_data[0].shape)
-
-
 for i in range(len(transfer_data)):
     width, heigth , _= transfer_data[i].shape
     stringData = transfer_data[i].tostring()
 
+    clientsock.send(str(server_start).ljust(16).encode())
     clientsock.send(str(width).ljust(16).encode())
     clientsock.send(str(heigth).ljust(16).encode())
 
     clientsock.send(stringData)
     
-    clientsock.recv(1024)
-clientsock.send(str(-1).encode())
+    output = clientsock.recv(1024).decode()
+    print(output)
+
+clientsock.send(str(-1).ljust(16).encode())
 clientsock.shutdown(socket.SHUT_WR)
 
 print("Connection end")

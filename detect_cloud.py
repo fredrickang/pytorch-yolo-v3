@@ -198,9 +198,14 @@ if __name__ ==  '__main__':
 
     
     while True:
-        width = int(recvall(conn,16).decode())
-        if width == -1:
+
+        server_start = int(recvall(conn,16).decode())
+        server_connected = time.time()
+
+        server_coneection = server_connected - server_start
+        if server_start == -1:
             break
+        width = int(recvall(conn,16).decode())
         height = int(recvall(conn,16).decode)
         
         stringData = recvall(conn,width*height*3)
@@ -342,8 +347,8 @@ if __name__ ==  '__main__':
 
         torch.cuda.empty_cache()
         '''
-        
-        conn.send('1'.encode('utf-8'))
+        print("Server connected in :",server_coneection)
+        conn.send('image handled'.encode())
     conn.close()
 
     
