@@ -198,12 +198,16 @@ if __name__ ==  '__main__':
 
     
     while True:
-        length = recvall(conn,16)
-        if length.decode() == '-1':
+        width = int(recvall(conn,16))
+        if width == -1:
             break
-        stringData = recvall(conn,int(length.decode()))
+        height = int(recvall(conn,16))
+        
+        stringData = recvall(conn,width*height*3)
 
         imlist = np.fromstring(stringData,dtype='uint8')
+
+        imlist = imlist.reshape((width,height,3))
 
         im_batches, orig_ims, im_dim_list = list(prep_image_cloud(imlist,inp_dim)) 
         im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
