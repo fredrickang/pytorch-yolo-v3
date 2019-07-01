@@ -199,7 +199,7 @@ if __name__ ==  '__main__':
     
     while True:
         length = recvall(conn,16)
-        if lenght == -1:
+        if length.decode() == '-1':
             break
         stringData = recvall(conn,int(length.decode()))
 
