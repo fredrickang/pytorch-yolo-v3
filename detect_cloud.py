@@ -231,20 +231,18 @@ if __name__ ==  '__main__':
 
         objs = {}
 
-        for batch in im_batches:
-            # load the image
-            print(batch.size())
-            start = time.time()
-            if CUDA:
-                batch = batch.cuda()
+        batch = im_batches
+        start = time.time()
+        if CUDA:
+            batch = batch.cuda()
 
             # Apply offsets to the result predictions
             # Tranform the predictions as described in the YOLO paper
             # flatten the prediction vector
             # B x (bbox cord x no. of anchors) x grid_w x grid_h --> B x bbox x (all the boxes)
             # Put every proposed box as a row.
-            with torch.no_grad():
-                prediction = model(Variable(batch), CUDA)
+        with torch.no_grad():
+            prediction = model(Variable(batch), CUDA)
 
             #        prediction = prediction[:,scale_indices]
 
@@ -255,36 +253,35 @@ if __name__ ==  '__main__':
             # But both these operations require looping, hence
             # clubbing these ops in one loop instead of two.
             # loops are slower than vectorised operations.
+        prediction = write_results(args.mode, prediction, confidence, num_classes, nms=True, nms_conf=nms_thesh)
 
-            prediction = write_results(args.mode, prediction, confidence, num_classes, nms=True, nms_conf=nms_thesh)
+        if type(prediction) == int:
+            i += 1
+            continue
 
-            if type(prediction) == int:
-                i += 1
-                continue
-
-            end = time.time()
+        end = time.time()
 
             #        print(end - start)
 
-            prediction[:, 0] += i * batch_size
+        prediction[:, 0] += i * batch_size
 
-            if not write:
-                output = prediction
-                write = 1
-            else:
-                if output.size()[1] == prediction.size()[1]:
-                    output = torch.cat((output, prediction))
+        if not write:
+            output = prediction
+            write = 1
+        else:
+            if output.size()[1] == prediction.size()[1]:
+                output = torch.cat((output, prediction))
 
-            for im_num, image in enumerate(imlist[i * batch_size: min((i + 1) * batch_size, len(imlist))]):
-                im_id = i * batch_size + im_num
-                objs = [classes[int(x[-1])] for x in output if int(x[0]) == im_id]
-                print("{0:20s} predicted in {1:6.3f} seconds".format(image.split("/")[-1], (end - start) / batch_size))
-                print("{0:20s} {1:s}".format("Objects Detected:", " ".join(objs)))
-                print("----------------------------------------------------------")
-            i += 1
+        for im_num, image in enumerate(imlist[i * batch_size: min((i + 1) * batch_size, len(imlist))]):
+            im_id = i * batch_size + im_num
+            objs = [classes[int(x[-1])] for x in output if int(x[0]) == im_id]
+            print("{0:20s} predicted in {1:6.3f} seconds".format(image.split("/")[-1], (end - start) / batch_size))
+            print("{0:20s} {1:s}".format("Objects Detected:", " ".join(objs)))
+            print("----------------------------------------------------------")
+        i += 1
 
-            if CUDA:
-                torch.cuda.synchronize()
+        if CUDA:
+            torch.cuda.synchronize()
 
         try:
             output
