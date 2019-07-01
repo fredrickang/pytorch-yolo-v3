@@ -52,7 +52,9 @@ for i in range(len(transfer_data)):
     
     output = clientsock.recv(1024).decode()
     recive_time = time.time()
-    print("Communication has been taken while ",recive_time -send_time, "sec")
+    print("image width:",width," image height:",heigth)
+    print("Communication time:",recive_time - send_time)
+    print("--------------------------------------")
 clientsock.send(str(-1).ljust(16).encode())
 clientsock.shutdown(socket.SHUT_WR)
 
