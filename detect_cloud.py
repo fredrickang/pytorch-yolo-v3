@@ -342,7 +342,6 @@ if __name__ ==  '__main__':
 
         torch.cuda.empty_cache()
         '''
-        print("Server connected in :",server_coneection)
         conn.send('image handled'.encode())
     conn.close()
 
