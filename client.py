@@ -44,7 +44,7 @@ for i in range(len(transfer_data)):
     clientsock.send(stringData)
     
     clientsock.recv(1024)
-clinetsock.send(-1.encode())
+clinetsock.send('-1'.encode())
 clientsock.shutdown(socket.SHUT_WR)
 
 print("Connection end")
