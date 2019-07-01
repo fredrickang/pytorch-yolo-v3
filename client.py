@@ -33,7 +33,8 @@ for i in range(len(imlist)):
     oriimg = cv2.imread(imlist[i])
     transfer_data.append(oriimg)
 
-server_start = time.time()
+
+
 
 clientsock  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsock.connect((HOST,PORT))
@@ -43,17 +44,18 @@ print("Server has been connected")
 for i in range(len(transfer_data)):
     width, heigth , _= transfer_data[i].shape
     stringData = transfer_data[i].tostring()
-
-    clientsock.send(str(server_start).ljust(16).encode())
+    send_time = time.time()
     clientsock.send(str(width).ljust(16).encode())
     clientsock.send(str(heigth).ljust(16).encode())
 
     clientsock.send(stringData)
     
     output = clientsock.recv(1024).decode()
-    print(output)
-
+    recive_time = time.time()
+    print("Communication has been taken while ",recive_time -send_time, "sec")
 clientsock.send(str(-1).ljust(16).encode())
 clientsock.shutdown(socket.SHUT_WR)
+
+
 
 print("Connection end")

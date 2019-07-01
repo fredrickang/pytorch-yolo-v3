@@ -198,14 +198,9 @@ if __name__ ==  '__main__':
 
     
     while True:
-
-        server_start = int(recvall(conn,16).decode())
-        server_connected = time.time()
-
-        server_coneection = server_connected - server_start
-        if server_start == -1:
-            break
         width = int(recvall(conn,16).decode())
+        if width == -1:
+            break
         height = int(recvall(conn,16).decode)
         
         stringData = recvall(conn,width*height*3)
