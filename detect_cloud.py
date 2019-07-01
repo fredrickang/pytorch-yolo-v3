@@ -271,13 +271,14 @@ if __name__ ==  '__main__':
         else:
             if output.size()[1] == prediction.size()[1]:
                 output = torch.cat((output, prediction))
-
+        '''
         for im_num, image in enumerate(imlist[i * batch_size: min((i + 1) * batch_size, len(imlist))]):
             im_id = i * batch_size + im_num
             objs = [classes[int(x[-1])] for x in output if int(x[0]) == im_id]
             print("{0:20s} predicted in {1:6.3f} seconds".format(image.split("/")[-1], (end - start) / batch_size))
             print("{0:20s} {1:s}".format("Objects Detected:", " ".join(objs)))
             print("----------------------------------------------------------")
+        '''
         i += 1
 
         if CUDA:
@@ -303,16 +304,12 @@ if __name__ ==  '__main__':
             output[i, [2, 4]] = torch.clamp(output[i, [2, 4]], 0.0, im_dim_list[i, 1])
 
         output_recast = time.time()
-
+        '''
         class_load = time.time()
 
         colors = pkl.load(open("pallete", "rb"))
 
         draw = time.time()
-
-
-        
-
 
         list(map(lambda x: write(x, im_batches, orig_ims), output))
 
@@ -340,6 +337,8 @@ if __name__ ==  '__main__':
         print("----------------------------------------------------------")
 
         torch.cuda.empty_cache()
+        '''
+        
         conn.send('done iter'.encode('utf-8'))
         if(num_img_inf == 11):
             break
