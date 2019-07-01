@@ -143,7 +143,6 @@ if __name__ ==  '__main__':
     nms_thesh = float(args.nms_thresh)
     start = 0
 
-# SIBAL!
     # GPU option
     print("GPU Mode")
     CUDA = True
@@ -208,7 +207,6 @@ if __name__ ==  '__main__':
 
         im_batches, orig_ims, im_dim_list = list(prep_image_cloud(imlist,inp_dim)) 
         im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
-        
         load_batch = time.time()
 
         if CUDA:
@@ -235,6 +233,7 @@ if __name__ ==  '__main__':
 
         for batch in im_batches:
             # load the image
+            print(batch.size())
             start = time.time()
             if CUDA:
                 batch = batch.cuda()
