@@ -204,8 +204,6 @@ if __name__ ==  '__main__':
         stringData = recvall(conn,int(length.decode()))
 
         imlist = np.fromstring(stringData,dtype='uint8')
-        
-        imlist = imlist.reshape((640,640,3))
 
         im_batches, orig_ims, im_dim_list = list(prep_image_cloud(imlist,inp_dim)) 
         im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
