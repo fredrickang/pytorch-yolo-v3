@@ -345,6 +345,7 @@ if __name__ ==  '__main__':
     print("{:25s}: {}".format("Resolution", args.reso))
     print("{:25s}: {}".format("Task", "Time Taken (in seconds)"))
     print()
+    print("{:25s}: {:2.3f}".format("Model load", gpu_1_e - gpu_1_s))
     print("{:25s}: {:2.3f}".format("Reading addresses", load_batch - read_dir))
     print("{:25s}: {:2.3f}".format("Loading batch", gpu_2_s - load_batch))
     print("{:25s}: {:2.3f}".format("Moving to GPU", time_consume))
