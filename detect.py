@@ -149,9 +149,12 @@ if __name__ ==  '__main__':
     assert inp_dim % 32 == 0 
     assert inp_dim > 32
 
+    gpu_1_s = time.time()
     #If there's a GPU availible, put the model on GPU
     if CUDA:
         model.cuda()
+
+    gpu_1_e = time.time()
     
     
     #Set the model in evaluation mode
@@ -179,11 +182,12 @@ if __name__ ==  '__main__':
     im_dim_list = [x[2] for x in batches]
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1,2)
     
-    moveto_cuda = time.time()
-    
+  
+    gpu_2_s = time.time()
     if CUDA:
         im_dim_list = im_dim_list.cuda()
-    
+    gpu_2_e = time.time()
+
     leftover = 0
     
     if (len(im_dim_list) % batch_size):
@@ -212,7 +216,7 @@ if __name__ ==  '__main__':
         start = time.time()
         if CUDA:
             batch = batch.cuda()
-        
+        gpu_3_e = time.time()
 
         #Apply offsets to the result predictions
         #Tranform the predictions as described in the YOLO paper
@@ -341,8 +345,8 @@ if __name__ ==  '__main__':
     print("{:25s}: {}".format("Task", "Time Taken (in seconds)"))
     print()
     print("{:25s}: {:2.3f}".format("Reading addresses", load_batch - read_dir))
-    print("{:25s}: {:2.3f}".format("Loading batch", moveto_cuda - load_batch))
-    print("{:25s}: {:2.3f}".format("moving to GPU", start_det_loop - moveto_cuda))
+    print("{:25s}: {:2.3f}".format("Loading batch", gpu_2_s - load_batch))
+    print("{:25s}: {:2.3f}".format("Moving to GPU", gpu_1_e -gpu_1_s + gpu_2_e -gpu_2_s + gpu_3_e -start ))
     print("{:25s}: {:2.3f}".format("Detection (" + str(len(imlist)) +  " images)", output_recast - start_det_loop))
     print("{:25s}: {:2.3f}".format("Output Processing", class_load - output_recast))
     print("{:25s}: {:2.3f}".format("Drawing Boxes", end - draw))
