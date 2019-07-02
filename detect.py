@@ -175,12 +175,11 @@ if __name__ ==  '__main__':
     
     batches = list(map(prep_image, imlist, [inp_dim for x in range(len(imlist))]))
     im_batches = [x[0] for x in batches]
-    print(im_batches[0].size())
     orig_ims = [x[1] for x in batches]
     im_dim_list = [x[2] for x in batches]
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1,2)
     
-    
+    moveto_cuda = time.time()
     
     if CUDA:
         im_dim_list = im_dim_list.cuda()
@@ -342,7 +341,8 @@ if __name__ ==  '__main__':
     print("{:25s}: {}".format("Task", "Time Taken (in seconds)"))
     print()
     print("{:25s}: {:2.3f}".format("Reading addresses", load_batch - read_dir))
-    print("{:25s}: {:2.3f}".format("Loading batch", start_det_loop - load_batch))
+    print("{:25s}: {:2.3f}".format("Loading batch", moveto_cuda - load_batch))
+    print("{:25s}: {:2.3f}".format("moving to GPU", start_det_loop - moveto_cuda))
     print("{:25s}: {:2.3f}".format("Detection (" + str(len(imlist)) +  " images)", output_recast - start_det_loop))
     print("{:25s}: {:2.3f}".format("Output Processing", class_load - output_recast))
     print("{:25s}: {:2.3f}".format("Drawing Boxes", end - draw))
