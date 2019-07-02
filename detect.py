@@ -210,7 +210,7 @@ if __name__ ==  '__main__':
     objs = {}
     
     
-    
+    time_consume = 0
     for batch in im_batches:
         #load the image
         start = time.time()
@@ -218,6 +218,7 @@ if __name__ ==  '__main__':
             batch = batch.cuda()
         gpu_3_e = time.time()
 
+        time_consume += gpu_3_e - start
         #Apply offsets to the result predictions
         #Tranform the predictions as described in the YOLO paper
         #flatten the prediction vector 
@@ -346,7 +347,7 @@ if __name__ ==  '__main__':
     print()
     print("{:25s}: {:2.3f}".format("Reading addresses", load_batch - read_dir))
     print("{:25s}: {:2.3f}".format("Loading batch", gpu_2_s - load_batch))
-    print("{:25s}: {:2.3f}".format("Moving to GPU", gpu_1_e -gpu_1_s + gpu_2_e -gpu_2_s + gpu_3_e -start ))
+    print("{:25s}: {:2.3f}".format("Moving to GPU", gpu_1_e -gpu_1_s + gpu_2_e -gpu_2_s + time_consume))
     print("{:25s}: {:2.3f}".format("Detection (" + str(len(imlist)) +  " images)", output_recast - start_det_loop))
     print("{:25s}: {:2.3f}".format("Output Processing", class_load - output_recast))
     print("{:25s}: {:2.3f}".format("Drawing Boxes", end - draw))
