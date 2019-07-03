@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from util import count_parameters as count
 from util import convert2cpu as cpu
 from PIL import Image, ImageDraw
-
+import time
 
 def letterbox_image(img, inp_dim):
     '''resize image with unchanged aspect ratio using padding'''
@@ -34,12 +34,24 @@ def prep_image(img, inp_dim):
     
     Returns a Variable 
     """
-
+    time1 = time.time()
     orig_im = cv2.imread(img)
+    time2 = time.time()
     dim = orig_im.shape[1], orig_im.shape[0]
+    time3 = time.time()
     img = (letterbox_image(orig_im, (inp_dim, inp_dim)))
+    time4 =time.time()
     img_ = img[:,:,::-1].transpose((2,0,1)).copy()
+    time5 = time.time()
     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
+    time6 = time.time()
+    
+    print("time1 {:2.3f}".format(time2 -time1))
+    print("time2 {:2.3f}".format(time3 -time2))
+    print("time3 {:2.3f}".format(time4 -time3))
+    print("time4 {:2.3f}".format(time5 -time4))
+    print("time5 {:2.3f}".format(time6 -time5))
+    
     return img_, orig_im, dim
 
 

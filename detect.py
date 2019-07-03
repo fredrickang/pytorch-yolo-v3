@@ -175,15 +175,24 @@ if __name__ ==  '__main__':
         os.makedirs(args.det)
         
     load_batch = time.time()
-    
+        
     batches = list(map(prep_image, imlist, [inp_dim for x in range(len(imlist))]))
+    test_1 = time.time()
     im_batches = [x[0] for x in batches]
+    test_2 = time.time()
     orig_ims = [x[1] for x in batches]
+    test_3 = time.time()
     im_dim_list = [x[2] for x in batches]
+    test_4 = time.time()
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1,2)
-    
-  
     gpu_2_s = time.time()
+    
+    print("1: {:2.3f}".format(test_1 - load_batch))
+    print("2: {:2.3f}".format( test_2 - test_1))
+    print("3: {:2.3f}".format(test_3 - test_2))
+    print("4: {:2.3f}".format(test_4 - test_3))
+    print("5: {:2.3f}".format( gpu_2_s - test_4))
+
     if CUDA:
         im_dim_list = im_dim_list.cuda()
     gpu_2_e = time.time()
