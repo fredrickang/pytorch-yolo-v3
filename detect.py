@@ -17,6 +17,7 @@ import pickle as pkl
 import itertools
 
 
+print(torch.cuda.current_device())
 ############
 # TODO: 1. GPU CPU mode switch
 #       2. Input resolution change
@@ -49,7 +50,7 @@ def get_test_input(input_dim, CUDA):
     img_ = Variable(img_)
     
     if CUDA:
-        img_ = img_.cuda()
+        img_ = img_.cuda('cuda:1')
     num_classes
     return img_
 
@@ -123,7 +124,7 @@ if __name__ ==  '__main__':
     if args.mode == "GPU":
         print("GPU Mode")
         if torch.cuda.is_available():
-            print("GPU is available")
+            ("GPU is available")
             CUDA = True
         else:
             print("GPU is not available")
@@ -152,7 +153,7 @@ if __name__ ==  '__main__':
     gpu_1_s = time.time()
     #If there's a GPU availible, put the model on GPU
     if CUDA:
-        model.cuda()
+        model.cuda('cuda:1')
 
     gpu_1_e = time.time()
     
@@ -189,7 +190,7 @@ if __name__ ==  '__main__':
     
 
     if CUDA:
-        im_dim_list = im_dim_list.cuda()
+        im_dim_list = im_dim_list.cuda('cuda:1')
     gpu_2_e = time.time()
 
     leftover = 0
@@ -219,7 +220,7 @@ if __name__ ==  '__main__':
         #load the image
         start = time.time()
         if CUDA:
-            batch = batch.cuda()
+            batch = batch.cuda('cuda:1')
         gpu_3_e = time.time()
 
         time_consume += gpu_3_e - start
@@ -228,9 +229,9 @@ if __name__ ==  '__main__':
         #flatten the prediction vector 
         # B x (bbox cord x no. of anchors) x grid_w x grid_h --> B x bbox x (all the boxes) 
         # Put every proposed box as a row.
-        
-        with torch.no_grad():
-            prediction = model(Variable(batch), CUDA)
+        with torch.cuda.device(1):
+            with torch.no_grad():
+                prediction = model(Variable(batch), CUDA)
         
 #        prediction = prediction[:,scale_indices]
 
@@ -243,7 +244,7 @@ if __name__ ==  '__main__':
         #clubbing these ops in one loop instead of two. 
         #loops are slower than vectorised operations. 
         
-        prediction = write_results(args.mode ,prediction, confidence, num_classes, nms = True, nms_conf = nms_thesh)
+            prediction = write_results(args.mode ,prediction, confidence, num_classes, nms = True, nms_conf = nms_thesh)
         
         
         if type(prediction) == int:
