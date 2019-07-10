@@ -187,11 +187,6 @@ if __name__ ==  '__main__':
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1,2)
     gpu_2_s = time.time()
     
-    print("1: {:2.3f}".format(test_1 - load_batch))
-    print("2: {:2.3f}".format( test_2 - test_1))
-    print("3: {:2.3f}".format(test_3 - test_2))
-    print("4: {:2.3f}".format(test_4 - test_3))
-    print("5: {:2.3f}".format( gpu_2_s - test_4))
 
     if CUDA:
         im_dim_list = im_dim_list.cuda()

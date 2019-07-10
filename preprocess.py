@@ -46,12 +46,6 @@ def prep_image(img, inp_dim):
     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
     time6 = time.time()
     
-    print("time1 {:2.3f}".format(time2 -time1))
-    print("time2 {:2.3f}".format(time3 -time2))
-    print("time3 {:2.3f}".format(time4 -time3))
-    print("time4 {:2.3f}".format(time5 -time4))
-    print("time5 {:2.3f}".format(time6 -time5))
-    
     return img_, orig_im, dim
 
 
