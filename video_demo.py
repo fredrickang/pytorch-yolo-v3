@@ -80,10 +80,13 @@ def arg_parse():
     parser.add_argument("--reso", dest = 'reso', help = 
                         "Input resolution of the network. Increase to increase accuracy. Decrease to increase speed",
                         default = "416", type = str)
+    parser.add_argument("--out_path",dest = 'out_path', type = str)
     return parser.parse_args()
 
 
-def inference(e, CUDA, frame, inp_dim, model):
+def inference(e, CUDA, frame, inp_dim, model, out):
+    imsize = (640, 360)
+
                 
     img, orig_im, dim = prep_image(frame, inp_dim)
             
@@ -118,6 +121,9 @@ def inference(e, CUDA, frame, inp_dim, model):
         pass
     else:
         cv2.imshow("frame", orig_im)
+        im = cv2.resize(orig_im,imsize)
+        if out is not None:
+            out.write(im)
         key = cv2.waitKey(1)
         if key & 0xFF == ord('q'):
             break
@@ -164,18 +170,23 @@ if __name__ == '__main__':
     assert cap.isOpened(), 'Cannot capture source'
     
     frames = 0
-   
+    if out_path is not None:
+        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        out = cv2.VideoWriter(out_path,fourcc,20, imsize)
+    else:
+        out = None
     while cap.isOpened():
         
         ret, frame = cap.read()
         if ret:
             e = threading.Event()
-            worker = Thread(target = inference, args = (e, CUDA, frame, inp_dim, model))
+            worker = Thread(target = inference, args = (e, CUDA, frame, inp_dim, model, out)
             worker.start()
             worker.join(0.033)
             if worker.is_alive():
                 e.set()
         else:
+
             break
     
 
