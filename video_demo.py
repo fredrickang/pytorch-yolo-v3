@@ -12,7 +12,9 @@ import pandas as pd
 import random 
 import pickle as pkl
 import argparse
-
+import threading import Thread
+import threading
+from queue import Queue
 
 def get_test_input(input_dim, CUDA):
     img = cv2.imread("dog-cycle-car.png")
@@ -81,7 +83,50 @@ def arg_parse():
     return parser.parse_args()
 
 
+def inference(e, CUDA, frame, inp_dim, model):
+                
+    img, orig_im, dim = prep_image(frame, inp_dim)
+            
+    im_dim = torch.FloatTensor(dim).repeat(1,2)                        
+            
+    if CUDA:        
+        im_dim = im_dim.cuda()
+        img = img.cuda()
+    
+    with torch.no_grad():   
+        output = model(Variable(img), CUDA)
+    output = write_results(output, 0.5, 80, nms = True, nms_conf = 0.4)
+
+    im_dim = im_dim.repeat(output.size(0), 1)
+    scaling_factor = torch.min(inp_dim/im_dim,1)[0].view(-1,1)
+    
+    output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim[:,0].view(-1,1))/2
+    output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim[:,1].view(-1,1))/2
+    
+    output[:,1:5] /= scaling_factor
+
+    for i in range(output.shape[0]):
+        output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
+        output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
+    
+    classes = load_classes('data/coco.names')
+    colors = pkl.load(open("pallete", "rb"))
+    
+    list(map(lambda x: write(x, orig_im), output))
+    
+    if e.isSet():
+        pass
+    else:
+        cv2.imshow("frame", orig_im)
+        key = cv2.waitKey(1)
+        if key & 0xFF == ord('q'):
+            break
+
+
+
 if __name__ == '__main__':
+    result_que = Queue()
+
     args = arg_parse()
     confidence = float(args.confidence)
     nms_thesh = float(args.nms_thresh)
@@ -119,64 +164,17 @@ if __name__ == '__main__':
     assert cap.isOpened(), 'Cannot capture source'
     
     frames = 0
-    start = time.time()    
+   
     while cap.isOpened():
         
         ret, frame = cap.read()
         if ret:
-            
-
-            img, orig_im, dim = prep_image(frame, inp_dim)
-            
-            im_dim = torch.FloatTensor(dim).repeat(1,2)                        
-            
-            
-            if CUDA:
-                im_dim = im_dim.cuda()
-                img = img.cuda()
-            
-            with torch.no_grad():   
-                output = model(Variable(img), CUDA)
-            output = write_results(output, confidence, num_classes, nms = True, nms_conf = nms_thesh)
-
-            if type(output) == int:
-                frames += 1
-                print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
-                cv2.imshow("frame", orig_im)
-                key = cv2.waitKey(1)
-                if key & 0xFF == ord('q'):
-                    break
-                continue
-            
-            
-
-            
-            im_dim = im_dim.repeat(output.size(0), 1)
-            scaling_factor = torch.min(inp_dim/im_dim,1)[0].view(-1,1)
-            
-            output[:,[1,3]] -= (inp_dim - scaling_factor*im_dim[:,0].view(-1,1))/2
-            output[:,[2,4]] -= (inp_dim - scaling_factor*im_dim[:,1].view(-1,1))/2
-            
-            output[:,1:5] /= scaling_factor
-    
-            for i in range(output.shape[0]):
-                output[i, [1,3]] = torch.clamp(output[i, [1,3]], 0.0, im_dim[i,0])
-                output[i, [2,4]] = torch.clamp(output[i, [2,4]], 0.0, im_dim[i,1])
-            
-            classes = load_classes('data/coco.names')
-            colors = pkl.load(open("pallete", "rb"))
-            
-            list(map(lambda x: write(x, orig_im), output))
-            
-            
-            cv2.imshow("frame", orig_im)
-            key = cv2.waitKey(1)
-            if key & 0xFF == ord('q'):
-                break
-            frames += 1
-            print("FPS of the video is {:5.2f}".format( frames / (time.time() - start)))
-
-            
+            e = threading.Event()
+            worker = Thread(target = inference, args = (e, CUDA, frame, inp_dim, model))
+            worker.start()
+            worker.join(0.033)
+            if worker.is_alive():
+                e.set()
         else:
             break
     
