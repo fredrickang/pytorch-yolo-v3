@@ -12,9 +12,8 @@ import pandas as pd
 import random 
 import pickle as pkl
 import argparse
-import threading import Thread
+from threading import Thread
 import threading
-from queue import Queue
 
 def get_test_input(input_dim, CUDA):
     img = cv2.imread("dog-cycle-car.png")
@@ -43,7 +42,7 @@ def prep_image(img, inp_dim):
     img_ = torch.from_numpy(img_).float().div(255.0).unsqueeze(0)
     return img_, orig_im, dim
 
-def write(x, img):
+def write(x, img, classes, colors):
     c1 = tuple(x[1:3].int())
     c2 = tuple(x[3:5].int())
     cls = int(x[-1])
@@ -81,13 +80,13 @@ def arg_parse():
                         "Input resolution of the network. Increase to increase accuracy. Decrease to increase speed",
                         default = "416", type = str)
     parser.add_argument("--out_path",dest = 'out_path', type = str)
+    parser.add_argument("--fps",dest= 'fps' ,type = float)
     return parser.parse_args()
 
 
 def inference(e, CUDA, frame, inp_dim, model, out):
     imsize = (640, 360)
-
-                
+    black = frame*0
     img, orig_im, dim = prep_image(frame, inp_dim)
             
     im_dim = torch.FloatTensor(dim).repeat(1,2)                        
@@ -98,7 +97,7 @@ def inference(e, CUDA, frame, inp_dim, model, out):
     
     with torch.no_grad():   
         output = model(Variable(img), CUDA)
-    output = write_results(output, 0.5, 80, nms = True, nms_conf = 0.4)
+    output = write_results(mode = "GPU",prediction = output, confidence = 0.5, num_classes = 80 , nms = True, nms_conf = 0.4)
 
     im_dim = im_dim.repeat(output.size(0), 1)
     scaling_factor = torch.min(inp_dim/im_dim,1)[0].view(-1,1)
@@ -115,29 +114,23 @@ def inference(e, CUDA, frame, inp_dim, model, out):
     classes = load_classes('data/coco.names')
     colors = pkl.load(open("pallete", "rb"))
     
-    list(map(lambda x: write(x, orig_im), output))
-    
+    list(map(lambda x: write(x, orig_im, classes, colors), output))
+    im = cv2.resize(orig_im, imsize)
     if e.isSet():
-        pass
+        out.write(black)
     else:
-        cv2.imshow("frame", orig_im)
-        im = cv2.resize(orig_im,imsize)
         if out is not None:
             out.write(im)
         key = cv2.waitKey(1)
-        if key & 0xFF == ord('q'):
-            break
 
 
 
 if __name__ == '__main__':
-    result_que = Queue()
-
     args = arg_parse()
     confidence = float(args.confidence)
     nms_thesh = float(args.nms_thresh)
     start = 0
-
+    time_limit = round(float(1.0/args.fps),4)
     CUDA = torch.cuda.is_available()
 
     num_classes = 80
@@ -168,25 +161,26 @@ if __name__ == '__main__':
     cap = cv2.VideoCapture(videofile)
     
     assert cap.isOpened(), 'Cannot capture source'
-    
+    imsize = (640,360) 
     frames = 0
-    if out_path is not None:
+    if args.out_path is not None:
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter(out_path,fourcc,20, imsize)
+        out = cv2.VideoWriter(args.out_path,fourcc, 10, imsize)
     else:
         out = None
+    black_img = np.zeros([640,360,3],dtype = np.uint8)
     while cap.isOpened():
         
         ret, frame = cap.read()
         if ret:
             e = threading.Event()
-            worker = Thread(target = inference, args = (e, CUDA, frame, inp_dim, model, out)
+            worker = Thread(target = inference, args = (e, CUDA, frame, inp_dim, model, out,))
             worker.start()
-            worker.join(0.033)
+            worker.join(time_limit)
             if worker.is_alive():
                 e.set()
+                out.write(black_img)
         else:
-
             break
     
 
